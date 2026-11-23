@@ -1,0 +1,8 @@
+[project]
+name = "tremortrack-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["fastapi", "uvicorn", "numpy", "scipy", "pydantic>=2", "cryptography", "matplotlib", "fpdf2", "httpx"]
+
+[dependency-groups]
+dev = ["pytest", "httpx"]

@@ -1,0 +1,1267 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TremorTrack+ API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/windows": {
+      "post": {
+        "summary": "Post Window",
+        "operationId": "post_window_v1_windows_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotionWindow"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/phone-test": {
+      "post": {
+        "summary": "Post Phone Test",
+        "operationId": "post_phone_test_v1_phone_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotionWindow"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/timeline": {
+      "get": {
+        "summary": "Get Timeline",
+        "operationId": "get_timeline_v1_patients__pid__timeline_get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Timeline"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/doses": {
+      "post": {
+        "summary": "Post Dose",
+        "operationId": "post_dose_v1_patients__pid__doses_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoseEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/baseline": {
+      "get": {
+        "summary": "Get Baseline",
+        "operationId": "get_baseline_v1_patients__pid__baseline_get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Baseline"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/review-queue": {
+      "get": {
+        "summary": "Get Review Queue",
+        "operationId": "get_review_queue_v1_review_queue_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewItem"
+                  },
+                  "type": "array",
+                  "title": "Response Get Review Queue V1 Review Queue Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/review-queue/{item_id}": {
+      "post": {
+        "summary": "Post Verdict",
+        "operationId": "post_verdict_v1_review_queue__item_id__post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewVerdict"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/report": {
+      "post": {
+        "summary": "Post Report",
+        "operationId": "post_report_v1_patients__pid__report_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en",
+                "hi",
+                "kn"
+              ],
+              "type": "string",
+              "default": "en",
+              "title": "Lang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/export": {
+      "post": {
+        "summary": "Post Export",
+        "operationId": "post_export_v1_patients__pid__export_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(pdf|csv|png)$",
+              "title": "Format"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/verify/{digest}": {
+      "get": {
+        "summary": "Get Verify",
+        "operationId": "get_verify_v1_verify__digest__get",
+        "parameters": [
+          {
+            "name": "digest",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Digest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/calm/evaluate": {
+      "post": {
+        "summary": "Post Calm Evaluate",
+        "operationId": "post_calm_evaluate_v1_patients__pid__calm_evaluate_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalmEvaluateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalmDecision"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/calm/outcome": {
+      "post": {
+        "summary": "Post Calm Outcome",
+        "operationId": "post_calm_outcome_v1_patients__pid__calm_outcome_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalmOutcome"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/calm/script": {
+      "get": {
+        "summary": "Get Calm Script",
+        "operationId": "get_calm_script_v1_calm_script_get",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en",
+                "hi",
+                "kn"
+              ],
+              "type": "string",
+              "default": "en",
+              "title": "Lang"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/consent": {
+      "post": {
+        "summary": "Post Consent",
+        "operationId": "post_consent_v1_patients__pid__consent_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Consent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/patients/{pid}/consent/{cid}": {
+      "delete": {
+        "summary": "Delete Consent",
+        "operationId": "delete_consent_v1_patients__pid__consent__cid__delete",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pid"
+            }
+          },
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Baseline": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "median_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Score"
+          },
+          "typical_hz": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Typical Hz"
+          },
+          "windows_seen": {
+            "type": "integer",
+            "title": "Windows Seen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "patient_id",
+          "median_score",
+          "typical_hz",
+          "windows_seen"
+        ],
+        "title": "Baseline"
+      },
+      "CalmDecision": {
+        "properties": {
+          "trigger": {
+            "type": "boolean",
+            "title": "Trigger"
+          },
+          "episode_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Episode Id"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tips",
+            "default": []
+          },
+          "suggest_contact_clinician": {
+            "type": "boolean",
+            "title": "Suggest Contact Clinician",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "trigger",
+          "reason"
+        ],
+        "title": "CalmDecision"
+      },
+      "CalmEvaluateRequest": {
+        "properties": {
+          "recent_score": {
+            "type": "number",
+            "title": "Recent Score"
+          },
+          "baseline_score": {
+            "type": "number",
+            "title": "Baseline Score"
+          },
+          "heart_rate_bpm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heart Rate Bpm"
+          },
+          "baseline_heart_rate_bpm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Heart Rate Bpm"
+          },
+          "manual": {
+            "type": "boolean",
+            "title": "Manual",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "recent_score",
+          "baseline_score"
+        ],
+        "title": "CalmEvaluateRequest"
+      },
+      "CalmOutcome": {
+        "properties": {
+          "episode_id": {
+            "type": "string",
+            "title": "Episode Id"
+          },
+          "tremor_settled": {
+            "type": "boolean",
+            "title": "Tremor Settled"
+          },
+          "heart_rate_settled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heart Rate Settled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "episode_id",
+          "tremor_settled"
+        ],
+        "title": "CalmOutcome"
+      },
+      "Consent": {
+        "properties": {
+          "consent_id": {
+            "type": "string",
+            "title": "Consent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent_id"
+        ],
+        "title": "Consent"
+      },
+      "DoseEvent": {
+        "properties": {
+          "taken_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Taken At"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "tags": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "caffeine",
+                "stress",
+                "sleep_poor"
+              ]
+            },
+            "type": "array",
+            "title": "Tags",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "taken_at",
+          "label"
+        ],
+        "title": "DoseEvent"
+      },
+      "ExportRequest": {
+        "properties": {
+          "consent_id": {
+            "type": "string",
+            "title": "Consent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent_id"
+        ],
+        "title": "ExportRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MotionWindow": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "sample_rate_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Sample Rate Hz"
+          },
+          "accel": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "maxItems": 3,
+              "minItems": 3
+            },
+            "type": "array",
+            "title": "Accel"
+          },
+          "gyro": {
+            "anyOf": [
+              {
+                "items": {
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array",
+                  "maxItems": 3,
+                  "minItems": 3
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gyro"
+          },
+          "heart_rate_bpm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heart Rate Bpm"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "watch",
+              "phone"
+            ],
+            "title": "Source",
+            "default": "watch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "patient_id",
+          "started_at",
+          "sample_rate_hz",
+          "accel"
+        ],
+        "title": "MotionWindow"
+      },
+      "Report": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "default": "Tracking report, not a diagnosis."
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "kn"
+            ],
+            "title": "Lang",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "patient_id",
+          "summary"
+        ],
+        "title": "Report"
+      },
+      "ReviewItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ScoreResult"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "patient_id",
+          "at",
+          "result"
+        ],
+        "title": "ReviewItem"
+      },
+      "ReviewVerdict": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "enum": [
+              "tremor",
+              "not_tremor",
+              "unsure"
+            ],
+            "title": "Label"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label"
+        ],
+        "title": "ReviewVerdict"
+      },
+      "ScoreResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "insufficient_data"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "activity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "resting",
+                  "walking",
+                  "eating",
+                  "writing",
+                  "brushing",
+                  "unknown"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity"
+          },
+          "tremor_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tremor Score"
+          },
+          "band_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Band Low"
+          },
+          "band_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Band High"
+          },
+          "dominant_hz": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dominant Hz"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "ScoreResult"
+      },
+      "Timeline": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "illustrative": {
+            "type": "boolean",
+            "title": "Illustrative",
+            "default": false
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/TimelinePoint"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "doses": {
+            "items": {
+              "$ref": "#/components/schemas/DoseEvent"
+            },
+            "type": "array",
+            "title": "Doses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "patient_id",
+          "points",
+          "doses"
+        ],
+        "title": "Timeline"
+      },
+      "TimelinePoint": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ScoreResult"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "result"
+        ],
+        "title": "TimelinePoint"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerifyResult": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "signed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valid"
+        ],
+        "title": "VerifyResult"
+      }
+    }
+  }
+}
