@@ -1,0 +1,78 @@
+# XcodeGen spec for the TremorTrack+ iPhone and watch apps. Regenerate after editing:
+#   cd ios && xcodegen
+# Signing: copy Config/Local.xcconfig.example to Config/Local.xcconfig and set your team id there (it is gitignored).
+name: TremorTrack
+options:
+  deploymentTarget:
+    iOS: "26.0"
+    watchOS: "26.0"
+  createIntermediateGroups: true
+configFiles:
+  Debug: Config/Base.xcconfig
+  Release: Config/Base.xcconfig
+packages:
+  TremorKit:
+    path: TremorKit
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+targetTemplates:
+  # The iPhone app. Two targets share it: one with the watch app embedded, one without.
+  PhoneApp:
+    type: application
+    platform: iOS
+    sources: [TremorTrack]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX)
+        PRODUCT_NAME: TremorTrack
+        TARGETED_DEVICE_FAMILY: "1"
+    info:
+      path: Config/${target_name}-Info.plist
+      properties:
+        CFBundleDisplayName: TremorTrack+
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSMotionUsageDescription: TremorTrack+ reads your phone's motion sensor during the 30-second tremor test.
+        NSLocalNetworkUsageDescription: TremorTrack+ sends tremor readings to your clinic's server on this network.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+targets:
+  TremorTrack:
+    templates: [PhoneApp]
+    dependencies:
+      - package: TremorKit
+      - target: TremorTrackWatch
+  # Same app and bundle id with no watch app inside, for installing before the watch is registered with the team.
+  TremorTrackPhoneOnly:
+    templates: [PhoneApp]
+    dependencies:
+      - package: TremorKit
+  TremorTrackWatch:
+    type: application
+    platform: watchOS
+    sources: [TremorTrackWatch]
+    dependencies:
+      - package: TremorKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).watchkitapp
+        PRODUCT_NAME: TremorTrack Watch
+    info:
+      path: TremorTrackWatch/Info.plist
+      properties:
+        CFBundleDisplayName: TremorTrack+
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: $(BUNDLE_ID_PREFIX)
+        WKBackgroundModes: [workout-processing]
+        NSMotionUsageDescription: TremorTrack+ reads your watch's motion sensor to measure tremor.
+        NSHealthShareUsageDescription: TremorTrack+ reads your heart rate during tracking, to support Calm Mode.
+        NSHealthUpdateUsageDescription: TremorTrack+ records tracking sessions as workouts so the watch keeps measuring with your wrist down.
+    entitlements:
+      path: TremorTrackWatch/TremorTrackWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
