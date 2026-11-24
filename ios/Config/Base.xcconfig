@@ -1,0 +1,6 @@
+// Shared build settings. Per-developer values (team id, bundle prefix) go in Local.xcconfig, which is gitignored.
+// A free Apple ID needs a bundle id no one else has registered, so change BUNDLE_ID_PREFIX there if signing complains.
+BUNDLE_ID_PREFIX = com.kineon.tremortrack
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"
