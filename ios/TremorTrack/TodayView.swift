@@ -12,7 +12,7 @@ struct TodayView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                     Greeting(name: model.account?.firstName)
-                    if !model.outbox.isEmpty { QueueRow() }
+                    if model.pendingUploads > 0 { QueueRow() }
                     TremorCard()
                     if let week = WeekCompare(timeline: model.timeline) {
                         sectionTitle("Highlights")
@@ -349,11 +349,11 @@ private struct QueueRow: View {
         HStack(spacing: 12) {
             Image(systemName: "arrow.triangle.2.circlepath").foregroundStyle(.orange)
             VStack(alignment: .leading, spacing: 1) {
-                Text("\(model.outbox.count) waiting to upload").font(.subheadline.weight(.semibold))
+                Text("\(model.pendingUploads) waiting to upload").font(.subheadline.weight(.semibold))
                 Text("Saved on this iPhone. They'll send when the server is back.").font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Retry") { Task { await model.drain() } }
+            Button("Retry") { Task { await model.sendPending() } }
                 .buttonStyle(.glass)
                 .controlSize(.small)
         }

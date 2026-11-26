@@ -18,10 +18,10 @@ The backend and doctor dashboard are built and tested. The Swift iPhone and Appl
 | Reports in English, Hindi and Kannada | Built. Hindi and Kannada text is machine-written and unreviewed. |
 | PDF, CSV and PNG export with consent, audit log and signed digest | Built. |
 | Calm voice (ElevenLabs) | Built, never called against the real API. Needs a key. |
-| Doctor dashboard (React) | Built. |
-| iPhone app (SwiftUI) | Written, not device-tested. Phone tremor test, live reading, today and history views, dose log, medical details, PDF/PNG report, offline upload queue. |
+| Doctor dashboard (React) | Saved patient files, two-sided live sharing, historical charts, and signed exports. |
+| iPhone app (SwiftUI) | Written, not device-tested. Phone tremor test, watch upload queue, offline reading history, dose log, medical details, and doctor access controls. |
 | Apple Watch app | Written, not device-tested. Live motion at 50 Hz under a workout session, all-day recording, dose log, Calm screen. Relays through the phone. |
-| Authentication | None. Do not expose this to a network. |
+| Authentication | Clinic key for saved files and a patient code for live sharing. Use synthetic data on a trusted network. |
 
 ## Run it
 
@@ -40,19 +40,26 @@ Dashboard, from `dashboard/`, with the backend running:
 
 ```
 npm install
-npm run dev                               # http://localhost:5173, proxies /v1 to port 8000
+npm run dev                               # http://localhost:5173, proxies dashboard API calls to port 8000
 ```
 
 Open the dashboard and load `demo-patient`. The demo patient is invented and is labelled illustrative everywhere it appears.
 
-iPhone and watch apps, on a Mac with Xcode 26 or newer, from `ios/`:
+iPhone and watch apps, on a Mac with Xcode and a toolchain that supports Swift tools version 6.4, from `ios/`:
 
 ```
 (cd TremorKit && swift test)             # shared package, no Xcode project needed
 cp Config/Local.xcconfig.example Config/Local.xcconfig   # set your team id and a unique bundle prefix, then open TremorTrack.xcodeproj
 ```
 
-`project.yml` is the source of the Xcode project: edit it and run `xcodegen`. For a phone to reach the backend, start it with `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000` and enter the Mac's address in the app. There is no authentication, so do this only on a trusted network or a personal hotspot. `TremorTrackPhoneOnly` is the same app without the watch, for installing before the watch is registered with your team.
+`project.yml` is the source of the Xcode project: edit it and run `xcodegen`. For a phone to reach the backend, start it with `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000` and enter the Mac's address in the app. Do this only on a trusted network or a personal hotspot with synthetic data. `TremorTrackPhoneOnly` is the same app without the watch, for installing before the watch is registered with your team.
+
+### Share readings and medical details with a doctor
+
+1. The watch sends motion windows to the paired iPhone. The phone saves them before uploading them for scoring, retries pending windows when connected, and keeps a copy of scored history and synced doses available offline.
+2. In the dashboard, enter the patient ID and clinic key to open the saved medical record and historical tremor and dose charts. This works without a patient code.
+3. To start a live feed, the doctor requests a six-digit code. The patient enters it under **Account → Live sharing with a doctor** and approves. The doctor selects **Start live sharing**.
+4. The backend files the phone’s approved tremor scores and its medical details under the patient ID. Recent scores show in the live feed for up to two minutes and then appear in history. Ending live sharing moves the remaining approved scores into history and keeps the saved medical record available. An active link expires after 24 hours.
 
 ## Configuration
 
@@ -61,6 +68,7 @@ All optional. Set them before starting the backend.
 | Variable | Default | Purpose |
 |---|---|---|
 | `KINEON_DB` | `kineon.sqlite3` | SQLite file. |
+| `KINEON_CLINIC_KEY` | none | Shared clinic key for opening saved files and requesting live links. The illustrative demo works without it. |
 | `KINEON_SIGNING_KEY` | `data/signing_key.pem` | Ed25519 key for signing exports. Created on first use with mode 0600. |
 | `ELEVENLABS_API_KEY` | none | Needed to generate the calm voice. Without it the voice route returns 503. |
 | `ELEVENLABS_VOICE_ID` | none | Default voice. `ELEVENLABS_VOICE_ID_KN`, `_HI` and `_EN` override it per language. |
@@ -79,6 +87,8 @@ cd ../dashboard && npm run gen
 ```
 
 Routes: `POST /v1/windows` and `POST /v1/phone-test` (score a motion window), `GET /v1/patients/{id}/timeline` and `/baseline`, `POST /v1/patients/{id}/doses`, `GET /v1/review-queue` and `POST /v1/review-queue/{id}`, `POST /v1/patients/{id}/report`, `POST /v1/patients/{id}/consent` and `DELETE .../consent/{cid}`, `POST /v1/patients/{id}/export?format=pdf|csv|png`, `GET /v1/verify/{digest}`, `POST /v1/patients/{id}/calm/evaluate` and `/calm/outcome`, `GET /v1/calm/script?lang=en|hi|kn`.
+
+Saved doctor routes use `X-Clinic-Key`. Live sharing uses `/v1/links` for approval and `GET /v1/doctor/patients/{id}/live` with the clinic key and approved bearer token. The phone uses `X-Patient-Device-Key` to associate its readings with the approved device.
 
 Notes for the Swift side:
 - A motion window carries accelerometer samples in g. The scorer needs at least 25 Hz and at least 5 seconds.
@@ -100,9 +110,9 @@ Exports are hashed with SHA-256 and signed with Ed25519. The digest comes back i
 - **The Hindi and Kannada text needs a native speaker** before it reaches a doctor.
 - **The PDF is English only.** Its fonts cannot draw Indian scripts.
 - **The iOS app is untested on hardware.** It has not been built on a device, and HealthKit under a free Apple ID is unconfirmed. The Swift package tests and the contract check need a Mac to run.
-- **The app's sign-in is a demo.** It keeps an account on the phone and verifies nothing. Medical details stay on the phone and are never uploaded. The report the phone exports is not signed: the signed report comes from the dashboard.
+- **The app's sign-in is a demo.** The phone keeps the original medical details. Live approval files a copy in the database. The record contains information entered in the app. Hospital records require an external integration. Signed reports come from the dashboard.
 - **The watch cannot run live all day.** All-day data comes from the watch's sensor recorder: no heart rate or gyroscope, and it arrives minutes late.
-- **No authentication.** Anyone who knows a patient id can read that patient's data and create a consent. Consent is ticked by clinic staff in the dashboard. A real deployment needs the patient's own consent screen on the phone.
+- **The doctor access flow is for demos.** Saved doctor endpoints use a shared clinic key. The original patient endpoints still allow legacy data access without identity verification. Use synthetic data until the service verifies patient and clinician identities and protects the patient API.
 - **The signing key is an unencrypted file, and Ed25519 is not post-quantum.** Production needs a KMS or HSM and a post-quantum scheme.
 
 ## Data

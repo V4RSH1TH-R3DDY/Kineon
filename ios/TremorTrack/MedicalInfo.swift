@@ -1,7 +1,6 @@
 // The patient's medical details, modelled on Apple's Medical ID plus what matters for tremor care:
 // diagnosis, affected side, medication schedule, DBS, care team and emergency contacts.
-// Kept on this iPhone only, in a file encrypted while the phone is locked. The backend has no sign-in, so this
-// is never uploaded.
+// Kept on this iPhone in a protected file. The patient can attach a copy to a specific doctor access link.
 import Foundation
 
 struct MedicalInfo: Codable, Equatable {
@@ -175,6 +174,47 @@ struct EmergencyContact: Codable, Equatable, Identifiable {
 }
 
 extension MedicalInfo {
+    struct SharedRecord: Encodable, Sendable {
+        let birthDate: String?
+        let sex: Sex?
+        let heightCm: Double?
+        let weightKg: Double?
+        let bloodType: String?
+        let dominantHand: Side?
+        let diagnosis: String?
+        let symptomsSinceYear: Int?
+        let diagnosedYear: Int?
+        let affectedSide: Side?
+        let symptoms: [String]
+        let stage: Int?
+        let hasDbs: Bool
+        let dbsSinceYear: Int?
+        let medications: [Medication]
+        let allergies: String
+        let otherConditions: String
+        let neurologist: CareContact
+        let familyDoctor: CareContact
+        let emergencyContacts: [EmergencyContact]
+        let notes: String
+        let updatedAt: Date?
+    }
+
+    var sharedRecord: SharedRecord {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.dateFormat = "yyyy-MM-dd"
+        return SharedRecord(
+            birthDate: birthDate.map { formatter.string(from: $0) }, sex: sex, heightCm: heightCm, weightKg: weightKg,
+            bloodType: bloodType?.rawValue, dominantHand: dominantHand,
+            diagnosis: diagnosis.map { $0 == .other && !diagnosisOther.isEmpty ? diagnosisOther : $0.title },
+            symptomsSinceYear: symptomsSinceYear, diagnosedYear: diagnosedYear, affectedSide: affectedSide,
+            symptoms: symptoms.map(\.title).sorted(), stage: stage, hasDbs: hasDBS, dbsSinceYear: dbsSinceYear,
+            medications: medications, allergies: allergies, otherConditions: otherConditions, neurologist: neurologist,
+            familyDoctor: familyDoctor, emergencyContacts: emergencyContacts, notes: notes, updatedAt: updatedAt
+        )
+    }
+
     static let fileURL = URL.applicationSupportDirectory.appending(path: "medical.json")
 
     static func load() -> MedicalInfo {

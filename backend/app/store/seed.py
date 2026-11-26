@@ -9,7 +9,7 @@ from datetime import UTC, datetime, timedelta
 
 import numpy as np
 
-from app.schemas import DoseEvent, ScoreResult
+from app.schemas import CareContact, DoseEvent, EmergencyContact, Medication, MedicalRecord, ScoreResult
 from app.store.db import Store
 
 DEMO_ID = "demo-patient"
@@ -20,6 +20,16 @@ END = datetime(2026, 11, 24, tzinfo=UTC)
 def seed_demo(store: Store, pid: str = DEMO_ID, days: int = 14, seed: int = 7) -> None:
     rng = np.random.default_rng(seed)
     store.add_patient(pid, illustrative=True)
+    store.set_record(pid, MedicalRecord(  # invented, like everything for this patient
+        sex="male", height_cm=170, weight_kg=68, blood_type="B+", dominant_hand="right",
+        diagnosis="Parkinson's disease", diagnosed_year=2020, symptoms_since_year=2018, affected_side="right",
+        symptoms=["Tremor at rest", "Slowness of movement"], stage=2,
+        medications=[Medication(name="Levodopa/Carbidopa", strength="100/25 mg", times=[8 * 60, 13 * 60, 20 * 60], with_food=False)],
+        allergies="Penicillin (rash)", other_conditions="Mild hypertension",
+        neurologist=CareContact(name="Dr. Example Neurologist", clinic="Illustrative Clinic"),
+        emergency_contacts=[EmergencyContact(name="Example Relative", relationship="Daughter", phone="0000000000")],
+        notes="Invented illustrative record. Not a real person.",
+    ).model_dump_json())
     for d in range(days):
         day = END - timedelta(days=days - d)
         stress = rng.random() < 0.2

@@ -117,6 +117,11 @@ public struct TimelinePoint: ContractModel, Equatable, Sendable {
     public var at: Date
     public var result: ScoreResult
 
+    public init(at: Date, result: ScoreResult) {
+        self.at = at
+        self.result = result
+    }
+
     enum CodingKeys: String, CodingKey, CaseIterable { case at, result }
     public static let schemaName = "TimelinePoint"
     public static var wireKeys: [String] { keys(CodingKeys.self) }
@@ -128,6 +133,13 @@ public struct Timeline: ContractModel, Sendable {
     public var illustrative: Bool
     public var points: [TimelinePoint]
     public var doses: [DoseEvent]
+
+    public init(patientId: String, illustrative: Bool = false, points: [TimelinePoint] = [], doses: [DoseEvent] = []) {
+        self.patientId = patientId
+        self.illustrative = illustrative
+        self.points = points
+        self.doses = doses
+    }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -248,5 +260,5 @@ public struct Report: ContractModel, Sendable {
 /// Every model the apps send or receive, for the contract test.
 public var contractModels: [any ContractModel.Type] { [
     MotionWindow.self, ScoreResult.self, DoseEvent.self, TimelinePoint.self, Timeline.self, Baseline.self,
-    CalmEvaluateRequest.self, CalmDecision.self, CalmOutcome.self, Consent.self, Report.self,
+    CalmEvaluateRequest.self, CalmDecision.self, CalmOutcome.self, Consent.self, Report.self, APIClient.ApprovedLink.self,
 ] }

@@ -1,7 +1,7 @@
 // The iPhone app's state: setup, the latest reading, the patient's usual level, and the upload queue.
-// Every window from the watch comes through here: it is posted to the backend, or queued on disk if that fails,
-// and the score goes back to the watch.
+// Watch windows are saved before upload. Scored readings stay in the phone's history and go back to the watch.
 import Foundation
+import CryptoKit
 import Observation
 import TremorKit
 
@@ -9,9 +9,18 @@ import TremorKit
 final class AppModel {
     // MARK: Setup (persisted)
 
-    var serverText: String { didSet { defaults.set(serverText, forKey: "serverURL") } }
-    var patientIdText: String { didSet { defaults.set(patientIdText, forKey: "patientId"); pushToWatch() } }
-    private(set) var consentId: String? { didSet { defaults.set(consentId, forKey: "consentId") } }
+    var serverText: String {
+        didSet {
+            defaults.set(serverText, forKey: "serverURL")
+            if oldValue != serverText { loadReadingHistory(); pushToWatch() }
+        }
+    }
+    var patientIdText: String {
+        didSet {
+            defaults.set(patientIdText, forKey: "patientId")
+            if oldValue != patientIdText { loadReadingHistory(); pushToWatch() }
+        }
+    }
     private(set) var isSetUp: Bool { didSet { defaults.set(isSetUp, forKey: "setupDone") } }
     /// The signed-in person. Demo sign-in: kept on this iPhone only, nothing is verified.
     private(set) var account: Account? {
@@ -21,10 +30,12 @@ final class AppModel {
     var server: URL? { SetupInput.serverURL(serverText) }
     var patientProblem: String? { SetupInput.patientIdProblem(patientIdText) }
     var patientId: String? { patientProblem == nil ? SetupInput.patientId(patientIdText) : nil }
-    var api: APIClient? { server.map { APIClient(baseURL: $0) } }
+    var api: APIClient? { server.map { APIClient(baseURL: $0, patientDeviceKey: patientDeviceKey) } }
 
-    /// Medical details, kept on this iPhone only.
+    /// The original medical details remain on this iPhone.
     private(set) var medical = MedicalInfo.load()
+    private var approvals: [DoctorApproval] = []
+    private let approvalsURL = URL.applicationSupportDirectory.appending(path: "doctor-approvals.json")
 
     // MARK: Live state
 
@@ -38,24 +49,38 @@ final class AppModel {
     private(set) var windowsReceived = 0
     private(set) var lastWatchWindowAt: Date?
     private(set) var outbox: Outbox
+    private(set) var watchUploads = 0
+    private(set) var watchStorageFailed = false
 
     let watch = PhoneWatchLink()
     /// Live accelerometer recording on the Tremor tab.
     let live = LiveTremor()
 
     private let defaults = UserDefaults.standard
+    private let patientDeviceKey: String = {
+        let defaults = UserDefaults.standard
+        if let key = defaults.string(forKey: "patientDeviceKey") { return key }
+        let key = UUID().uuidString + UUID().uuidString
+        defaults.set(key, forKey: "patientDeviceKey")
+        return key
+    }()
     private let outboxURL = URL.applicationSupportDirectory.appending(path: "outbox.json")
     private var draining = false
+    private var drainingWatch = false
     private var strap = StrapMonitor()
 
     init() {
         serverText = defaults.string(forKey: "serverURL") ?? "http://192.168.1.10:8000"
         patientIdText = defaults.string(forKey: "patientId") ?? ""
-        consentId = defaults.string(forKey: "consentId")
         isSetUp = defaults.bool(forKey: "setupDone")
         account = defaults.data(forKey: "account").flatMap { try? JSONDecoder().decode(Account.self, from: $0) }
         try? FileManager.default.createDirectory(at: .applicationSupportDirectory, withIntermediateDirectories: true)
         outbox = Outbox.load(from: outboxURL)
+        if let data = try? Data(contentsOf: approvalsURL),
+           let saved = try? JSONDecoder().decode([DoctorApproval].self, from: data) {
+            approvals = saved
+        }
+        loadReadingHistory()
         watch.onWindow = { [weak self] w in Task { await self?.ingest(w) } }
         watch.onDose = { [weak self] d in Task { await self?.logDose(d) } }
         watch.onActivated = { [weak self] in self?.pushToWatch() }
@@ -63,6 +88,7 @@ final class AppModel {
     }
 
     var usual: Double? { baseline?.medianScore }
+    var pendingUploads: Int { outbox.count + watchUploads }
 
     // MARK: Setup
 
@@ -82,11 +108,10 @@ final class AppModel {
         }
     }
 
-    func finishSetup(shareWithClinic: Bool) async {
+    func finishSetup() async {
         isSetUp = true
         pushToWatch()
         await Alerts.shared.requestPermission()
-        if shareWithClinic { _ = await setSharing(true) }
         await refresh()
     }
 
@@ -124,47 +149,74 @@ final class AppModel {
         MedicalInfo.erase()
         resetSetup()
         patientIdText = ""
-        consentId = nil
     }
 
     // MARK: Consent
 
-    var isSharing: Bool { consentId != nil }
+    struct DoctorApproval: Codable, Identifiable {
+        var id: String { link.linkId }
+        let link: APIClient.ApprovedLink
+        let server: URL
+        let patientId: String
+        let approvedAt: Date
+        var sharedRecord: Bool
+    }
 
-    /// Gives or withdraws consent for the clinic to export this patient's data. Returns false if the server said no.
-    func setSharing(_ on: Bool) async -> Bool {
-        guard let api, let patientId else { return false }
+    var doctorApprovals: [DoctorApproval] {
+        approvals.filter { $0.patientId == patientId && $0.server == server }
+    }
+
+    func approveDoctor(code: String) async throws {
+        guard let api, let patientId else { throw URLError(.badURL) }
+        let record = medical.isEmpty ? nil : medical.sharedRecord
+        let link = try await api.approveLink(patientId: patientId, code: code, record: record)
+        let approval = DoctorApproval(link: link, server: api.baseURL, patientId: patientId, approvedAt: .now, sharedRecord: record != nil)
         do {
-            if on {
-                consentId = try await api.giveConsent(patientId: patientId).consentId
-            } else if let id = consentId {
-                do { try await api.withdrawConsent(patientId: patientId, consentId: id) } catch APIError.notFound {}
-                consentId = nil
-            }
-            return true
+            try saveApprovals(approvals + [approval])
         } catch {
-            return false
+            try? await api.revokeLink(linkId: link.linkId, patientSecret: link.patientSecret)
+            throw error
         }
+    }
+
+    func updateDoctorRecord(_ approval: DoctorApproval) async throws {
+        guard doctorApprovals.contains(where: { $0.id == approval.id }) else { throw URLError(.badURL) }
+        try await APIClient(baseURL: approval.server)
+            .updateLinkRecord(linkId: approval.id, patientSecret: approval.link.patientSecret, record: medical.sharedRecord)
+        var updated = approvals
+        if let i = updated.firstIndex(where: { $0.id == approval.id }) {
+            updated[i].sharedRecord = true
+            try saveApprovals(updated)
+        }
+    }
+
+    func endDoctorAccess(_ approval: DoctorApproval) async throws {
+        do {
+            try await APIClient(baseURL: approval.server).revokeLink(linkId: approval.id, patientSecret: approval.link.patientSecret)
+        } catch APIError.notFound {}
+        try saveApprovals(approvals.filter { $0.id != approval.id })
+    }
+
+    private func saveApprovals(_ updated: [DoctorApproval]) throws {
+        try JSONEncoder().encode(updated).write(to: approvalsURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        approvals = updated
     }
 
     // MARK: Readings
 
     func ingest(_ w: MotionWindow) async {
-        var w = w
-        if let patientId { w.patientId = patientId }
-        lastWatchWindowAt = .now
+        guard let scope = readingScope, w.patientId == scope.patientId else { return }
+        lastWatchWindowAt = max(lastWatchWindowAt ?? .distantPast, w.startedAt)
         windowsReceived += 1
         do {
-            let r = try await post(.window(w))
-            show(r, at: w.startedAt, source: .watch)
-            // Strap alerts are for what is happening now, not for all-day data collected hours later.
-            if let r, Date().timeIntervalSince(w.startedAt) < 120, let alert = strap.check(r.reason) {
-                Alerts.shared.post(id: "strap", title: alert.title, body: alert.body)
-            }
-            await drain()
+            try scope.save(w)
+            watchUploads = scope.pending.count
+            watchStorageFailed = false
         } catch {
-            enqueue(.window(w))
+            watchStorageFailed = true
+            return
         }
+        await drainWatch()
     }
 
     /// A 10-second window from a live recording: scored like any other, queued if the server is down,
@@ -204,8 +256,61 @@ final class AppModel {
     }
 
     func refresh() async {
-        await drain()
+        await sendPending()
         await refreshTimeline()
+    }
+
+    func sendPending() async {
+        await drainWatch()
+        await drain()
+    }
+
+    private func drainWatch() async {
+        guard !drainingWatch, let scope = readingScope else { return }
+        drainingWatch = true
+        defer {
+            drainingWatch = false
+            watchUploads = readingScope?.pending.count ?? 0
+        }
+        let client = APIClient(baseURL: scope.server, patientDeviceKey: patientDeviceKey)
+        while readingScope == scope {
+            let pending = scope.pending
+            if pending.isEmpty { return }
+            for file in pending {
+                guard readingScope == scope else { return }
+                do {
+                    let window = try JSONDecoder.tremor.decode(MotionWindow.self, from: Data(contentsOf: file))
+                    let result: ScoreResult
+                    do {
+                        result = try await client.postWindow(window, uploadId: file.deletingPathExtension().lastPathComponent)
+                        if readingScope == scope { serverReachable = true }
+                    } catch {
+                        if readingScope == scope { serverReachable = error is APIError }
+                        return
+                    }
+                    let visible = readingScope == scope
+                    var history = (visible ? timeline : scope.loadHistory()) ?? Timeline(patientId: scope.patientId)
+                    let point = TimelinePoint(at: window.startedAt, result: result)
+                    if !history.points.contains(point) {
+                        history.points.append(point)
+                        history.points.sort { $0.at < $1.at }
+                    }
+                    try scope.saveHistory(history)
+                    try FileManager.default.removeItem(at: file)
+                    if visible {
+                        timeline = history
+                        watchStorageFailed = false
+                        show(result, at: window.startedAt, source: .watch)
+                        if Date().timeIntervalSince(window.startedAt) < 120, let alert = strap.check(result.reason) {
+                            Alerts.shared.post(id: "strap", title: alert.title, body: alert.body)
+                        }
+                    }
+                } catch {
+                    if readingScope == scope { watchStorageFailed = true }
+                    return
+                }
+            }
+        }
     }
 
     /// Retries queued readings oldest first.
@@ -220,12 +325,21 @@ final class AppModel {
     }
 
     private func refreshTimeline() async {
-        guard let api, let patientId else { return }
+        guard let scope = readingScope else { return }
+        let api = APIClient(baseURL: scope.server, patientDeviceKey: patientDeviceKey)
         do {
-            async let b = api.baseline(patientId: patientId)
-            async let t = api.timeline(patientId: patientId)
-            baseline = try await b
-            timeline = try await t
+            async let b = api.baseline(patientId: scope.patientId)
+            async let t = api.timeline(patientId: scope.patientId)
+            let (newBaseline, fetchedHistory) = try await (b, t)
+            var history = fetchedHistory
+            guard readingScope == scope else { return }
+            let serverPoints = Set(history.points.map(\.at))
+            let cachedPoints = timeline?.points ?? []
+            history.points.append(contentsOf: cachedPoints.filter { !serverPoints.contains($0.at) })
+            history.points.sort { $0.at < $1.at }
+            baseline = newBaseline
+            timeline = history
+            do { try scope.saveHistory(history) } catch { watchStorageFailed = true }
             serverReachable = true
             pushToWatch()
             if latest == nil, let p = timeline?.points.max(by: { $0.at < $1.at }) {
@@ -233,11 +347,25 @@ final class AppModel {
                 pushToWatch()
             }
         } catch APIError.notFound {
-            // No readings yet for this patient.
-            serverReachable = true
-            timeline = nil
+            if readingScope == scope { serverReachable = true }
         } catch {
-            serverReachable = false
+            if readingScope == scope { serverReachable = false }
+        }
+    }
+
+    private var readingScope: ReadingScope? {
+        guard let server, let patientId else { return nil }
+        return ReadingScope(server: server, patientId: patientId)
+    }
+
+    private func loadReadingHistory() {
+        latest = nil; latestAt = nil; latestSource = nil; baseline = nil
+        timeline = readingScope?.loadHistory()
+        watchUploads = readingScope?.pending.count ?? 0
+        watchStorageFailed = false
+        if let point = timeline?.points.last {
+            latest = point.result
+            latestAt = point.at
         }
     }
 
@@ -274,6 +402,40 @@ final class AppModel {
     private func pushToWatch() {
         watch.push(PhoneContext(patientId: isSetUp ? patientId : nil, latest: latest, latestAt: latestAt,
                                 usual: baseline?.medianScore))
+    }
+}
+
+private struct ReadingScope: Equatable {
+    let server: URL
+    let patientId: String
+
+    private var directory: URL {
+        let key = SHA256.hash(data: Data("\(server.absoluteString)\n\(patientId)".utf8))
+        return URL.applicationSupportDirectory.appending(path: "readings/\(key.map { String(format: "%02x", $0) }.joined())")
+    }
+
+    private var historyURL: URL { directory.appending(path: "history.json") }
+    private var pendingURL: URL { directory.appending(path: "pending") }
+
+    var pending: [URL] {
+        let files = try? FileManager.default.contentsOfDirectory(at: pendingURL, includingPropertiesForKeys: nil)
+        return (files ?? []).filter { $0.pathExtension == "json" }.sorted { $0.lastPathComponent < $1.lastPathComponent }
+    }
+
+    func save(_ window: MotionWindow) throws {
+        try FileManager.default.createDirectory(at: pendingURL, withIntermediateDirectories: true)
+        let file = pendingURL.appending(path: "\(WireDate.format(window.startedAt)).json")
+        try JSONEncoder.tremor.encode(window).write(to: file, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    }
+
+    func loadHistory() -> Timeline? {
+        guard let data = try? Data(contentsOf: historyURL) else { return nil }
+        return try? JSONDecoder.tremor.decode(Timeline.self, from: data)
+    }
+
+    func saveHistory(_ history: Timeline) throws {
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try JSONEncoder.tremor.encode(history).write(to: historyURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
 }
 
