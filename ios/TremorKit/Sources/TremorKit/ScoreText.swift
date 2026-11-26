@@ -31,3 +31,23 @@ public enum ScoreDisplay: Equatable, Sendable {
         }
     }
 }
+
+/// How a score sits against the patient's own usual level. Never a judgement about health.
+public enum UsualComparison: Equatable, Sendable {
+    case lower, usual, higher
+
+    /// shortcut: a fixed margin of 25% of the baseline plus 5 points, chosen by eye. Needs tuning on real patients.
+    public init?(score: Double, baseline: Double?) {
+        guard let b = baseline else { return nil }
+        let margin = 0.25 * b + 5
+        if score > b + margin { self = .higher } else if score < b - margin { self = .lower } else { self = .usual }
+    }
+
+    public var text: String {
+        switch self {
+        case .lower: "Lower than your usual"
+        case .usual: "About your usual"
+        case .higher: "Higher than your usual"
+        }
+    }
+}

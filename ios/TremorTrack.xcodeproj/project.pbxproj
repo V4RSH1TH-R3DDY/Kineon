@@ -7,22 +7,53 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		069252BD26E2CA4DC86BADEF /* SetupCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD6E5019704DDECAE7B4C4C /* SetupCheckView.swift */; };
-		0A2E575ABBABD348CD9A408A /* SetupCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD6E5019704DDECAE7B4C4C /* SetupCheckView.swift */; };
+		00AD5BCA05F20A39D51132DC /* TrackingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A65B0EFA4D592CFCA726D8 /* TrackingSession.swift */; };
+		00BF4D3D73DF8134C2600D74 /* WatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC694D227AAC1D895C9732FD /* WatchLink.swift */; };
+		02213CD2DF95560ACE01F172 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516A4B546F4A8E0676F0FAA4 /* AppModel.swift */; };
+		08A0A26EA3BF5CA537C4DA21 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23923D2F80BE61D8CB875F /* HistoryView.swift */; };
 		1090F18216F5ABB37DB13031 /* PhoneMotionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017C6036504EE1266ACBB71B /* PhoneMotionSource.swift */; };
 		19B7779810A529DE3AF80A58 /* TremorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8B7D9D0DD0A05BB154CEB9A7 /* TremorKit */; };
+		1FB05B115D34B8F484155058 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C925F7426F47428B0F86A5 /* Components.swift */; };
 		2088AFD36FBA875B7069C0A8 /* TremorKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2FC57E5E5BC1B42EF235978A /* TremorKit */; };
+		22FEA9C831FB960C4B244B87 /* MedicalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1905A5F24AAE8BF46922A8A /* MedicalView.swift */; };
+		32624259CF07284FC2A531FD /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F34503AA790E9AB7D8818C /* OnboardingView.swift */; };
+		37243283A435D32C30134824 /* MedicalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1905A5F24AAE8BF46922A8A /* MedicalView.swift */; };
+		38428E19D8730B5F6CB8A742 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C925F7426F47428B0F86A5 /* Components.swift */; };
 		3F14BED9804013EB2EC942CD /* PhoneWatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE73D3087A142B0A8D4681EB /* PhoneWatchLink.swift */; };
+		40F1D2091BB3BB0CFEF3649F /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194AF4ECA260E6371A14E58B /* LoginView.swift */; };
+		4462AF662F990338B87FEC29 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A1832077E12C2E2A64A2A6 /* Alerts.swift */; };
 		4E0D1EDD8FE6E07FA660F053 /* PhoneTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C2A581CD14E451EF96CC84 /* PhoneTestView.swift */; };
+		56DEE2B4C751B324ECA803AA /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516A4B546F4A8E0676F0FAA4 /* AppModel.swift */; };
 		596429533217C483A3A83099 /* PhoneWatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE73D3087A142B0A8D4681EB /* PhoneWatchLink.swift */; };
 		5998252E27243BF8FB73EBE1 /* PhoneMotionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 017C6036504EE1266ACBB71B /* PhoneMotionSource.swift */; };
+		5A5E79CDDEC4E428F15DAC45 /* CalmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13F7E3CA065789A6B3DDA3F /* CalmView.swift */; };
+		6353D28FED34BDD083AE36A2 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23923D2F80BE61D8CB875F /* HistoryView.swift */; };
+		6C335F364E4E3640AC26DCA0 /* LiveTremor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A246AA3545737F5FC4A2A8DB /* LiveTremor.swift */; };
 		6D47CD03EDFC0304618B7684 /* TremorTrackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CB1E2CD7F025CFEB707C44 /* TremorTrackApp.swift */; };
 		71D41F4C3E2D72177E0C9555 /* TremorTrackWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3A0D9418791FCEA71F021544 /* TremorTrackWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		75E614A8A5ED58281818854C /* MedicalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937FD9316CF7767ACF7D6A69 /* MedicalInfo.swift */; };
 		7646210682942458C9504011 /* TremorTrackApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CB1E2CD7F025CFEB707C44 /* TremorTrackApp.swift */; };
+		8081E23781BB14767D00CB9E /* MotionCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF2913864F91ADD554C91225 /* MotionCapture.swift */; };
 		87EDF041DB4ACA477A240999 /* TremorKit in Frameworks */ = {isa = PBXBuildFile; productRef = F4518BAE8B0716CA76BEADA2 /* TremorKit */; };
-		A447543A72E2E39B2A39A7BB /* SigningCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F461CBA5E5BD0EAAC8508D1 /* SigningCheckView.swift */; };
+		8D917E70FFFAD7B9ABE0AF8E /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9112B01D242CB4CEB9B6053 /* AccountView.swift */; };
+		8E62B90D5F8ED5B3C350BD40 /* LiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE63ED66650FC0B2A8FE014 /* LiveView.swift */; };
+		8F433FFF68DF5CDAC3C0C9A7 /* DoseLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7C1BE226FBA296A9AC9DFA /* DoseLogView.swift */; };
+		8F7C797A402179D2838A0BA4 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9112B01D242CB4CEB9B6053 /* AccountView.swift */; };
+		94E10896A32C75D07AF222CC /* MedicalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937FD9316CF7767ACF7D6A69 /* MedicalInfo.swift */; };
+		B122EF63FA0F45B49D6DE702 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0FB812E3F14E51408989E0 /* TodayView.swift */; };
+		BA28C4AD67227C5F072F684D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F34503AA790E9AB7D8818C /* OnboardingView.swift */; };
+		C3358D0678615888A39B5073 /* TremorReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A2879965ED18F81541937D /* TremorReport.swift */; };
+		C69DC978704C0A130F94FAE8 /* DoseLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7C1BE226FBA296A9AC9DFA /* DoseLogView.swift */; };
 		C6CC99AA0F42F80E56476B43 /* PhoneTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C2A581CD14E451EF96CC84 /* PhoneTestView.swift */; };
+		C7BFC65BFE30BC82DDF85112 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194AF4ECA260E6371A14E58B /* LoginView.swift */; };
+		C970393A6DE2B3E06D7844C4 /* AllDayRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F3CBC3815CDAE89B6AECA5 /* AllDayRecorder.swift */; };
+		DF8F92499FCAC0DFAA099486 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14A1832077E12C2E2A64A2A6 /* Alerts.swift */; };
 		E824B1F20C59CCE4E749E3E1 /* TremorTrackWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BF45C56F73036B3F7DB040 /* TremorTrackWatchApp.swift */; };
+		EDCF20E064B13DA50FE74151 /* LiveTremor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A246AA3545737F5FC4A2A8DB /* LiveTremor.swift */; };
+		EFCC54C12D6149A6399FA972 /* TremorReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A2879965ED18F81541937D /* TremorReport.swift */; };
+		F179BB316934BED722D0133A /* DoseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1B465D61FD000CF4679BB7 /* DoseView.swift */; };
+		FC42708373EB686340D5C9A9 /* WatchTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFDC69A7679607BC7A1170D /* WatchTracker.swift */; };
+		FC74B3222AD5CD31C874EA6C /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F0FB812E3F14E51408989E0 /* TodayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,17 +84,36 @@
 		017C6036504EE1266ACBB71B /* PhoneMotionSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneMotionSource.swift; sourceTree = "<group>"; };
 		0427CD54952B315163BA0493 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		04CB1E2CD7F025CFEB707C44 /* TremorTrackApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TremorTrackApp.swift; sourceTree = "<group>"; };
+		0CE63ED66650FC0B2A8FE014 /* LiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveView.swift; sourceTree = "<group>"; };
 		1332FCD4A756F0233B150BD4 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		14A1832077E12C2E2A64A2A6 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
+		194AF4ECA260E6371A14E58B /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		1A53BD70E31C412F363BAD7F /* TremorTrackWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TremorTrackWatch.entitlements; sourceTree = "<group>"; };
 		224E894BFE5EDA6D7BDF374E /* TremorKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TremorKit; path = TremorKit; sourceTree = SOURCE_ROOT; };
+		29A2879965ED18F81541937D /* TremorReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TremorReport.swift; sourceTree = "<group>"; };
+		2EFDC69A7679607BC7A1170D /* WatchTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTracker.swift; sourceTree = "<group>"; };
 		3A0D9418791FCEA71F021544 /* TremorTrackWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TremorTrackWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B7C1BE226FBA296A9AC9DFA /* DoseLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseLogView.swift; sourceTree = "<group>"; };
+		3C23923D2F80BE61D8CB875F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		3F0FB812E3F14E51408989E0 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		41C925F7426F47428B0F86A5 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		516A4B546F4A8E0676F0FAA4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		5E78AEA88FE132BB7AA73D36 /* TremorTrackPhoneOnly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TremorTrackPhoneOnly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66BF45C56F73036B3F7DB040 /* TremorTrackWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TremorTrackWatchApp.swift; sourceTree = "<group>"; };
 		66D39444EFAA9200AEA65A89 /* TremorTrack.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TremorTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6F461CBA5E5BD0EAAC8508D1 /* SigningCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningCheckView.swift; sourceTree = "<group>"; };
+		937FD9316CF7767ACF7D6A69 /* MedicalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalInfo.swift; sourceTree = "<group>"; };
+		A246AA3545737F5FC4A2A8DB /* LiveTremor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTremor.swift; sourceTree = "<group>"; };
+		BC694D227AAC1D895C9732FD /* WatchLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLink.swift; sourceTree = "<group>"; };
+		BF2913864F91ADD554C91225 /* MotionCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionCapture.swift; sourceTree = "<group>"; };
+		C13F7E3CA065789A6B3DDA3F /* CalmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalmView.swift; sourceTree = "<group>"; };
+		C6F34503AA790E9AB7D8818C /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		D3F3CBC3815CDAE89B6AECA5 /* AllDayRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllDayRecorder.swift; sourceTree = "<group>"; };
 		D7C2A581CD14E451EF96CC84 /* PhoneTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneTestView.swift; sourceTree = "<group>"; };
-		EAD6E5019704DDECAE7B4C4C /* SetupCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupCheckView.swift; sourceTree = "<group>"; };
+		E1905A5F24AAE8BF46922A8A /* MedicalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicalView.swift; sourceTree = "<group>"; };
+		ED1B465D61FD000CF4679BB7 /* DoseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseView.swift; sourceTree = "<group>"; };
 		EE73D3087A142B0A8D4681EB /* PhoneWatchLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchLink.swift; sourceTree = "<group>"; };
+		F2A65B0EFA4D592CFCA726D8 /* TrackingSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingSession.swift; sourceTree = "<group>"; };
+		F9112B01D242CB4CEB9B6053 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,10 +184,17 @@
 		CB8D307268F87E1C7A2356E3 /* TremorTrackWatch */ = {
 			isa = PBXGroup;
 			children = (
+				D3F3CBC3815CDAE89B6AECA5 /* AllDayRecorder.swift */,
+				C13F7E3CA065789A6B3DDA3F /* CalmView.swift */,
+				ED1B465D61FD000CF4679BB7 /* DoseView.swift */,
 				0427CD54952B315163BA0493 /* Info.plist */,
-				6F461CBA5E5BD0EAAC8508D1 /* SigningCheckView.swift */,
+				0CE63ED66650FC0B2A8FE014 /* LiveView.swift */,
+				BF2913864F91ADD554C91225 /* MotionCapture.swift */,
+				F2A65B0EFA4D592CFCA726D8 /* TrackingSession.swift */,
 				1A53BD70E31C412F363BAD7F /* TremorTrackWatch.entitlements */,
 				66BF45C56F73036B3F7DB040 /* TremorTrackWatchApp.swift */,
+				BC694D227AAC1D895C9732FD /* WatchLink.swift */,
+				2EFDC69A7679607BC7A1170D /* WatchTracker.swift */,
 			);
 			path = TremorTrackWatch;
 			sourceTree = "<group>";
@@ -145,10 +202,22 @@
 		F561B5EA5F2FD703B0A7CDBC /* TremorTrack */ = {
 			isa = PBXGroup;
 			children = (
+				F9112B01D242CB4CEB9B6053 /* AccountView.swift */,
+				14A1832077E12C2E2A64A2A6 /* Alerts.swift */,
+				516A4B546F4A8E0676F0FAA4 /* AppModel.swift */,
+				41C925F7426F47428B0F86A5 /* Components.swift */,
+				3B7C1BE226FBA296A9AC9DFA /* DoseLogView.swift */,
+				3C23923D2F80BE61D8CB875F /* HistoryView.swift */,
+				A246AA3545737F5FC4A2A8DB /* LiveTremor.swift */,
+				194AF4ECA260E6371A14E58B /* LoginView.swift */,
+				937FD9316CF7767ACF7D6A69 /* MedicalInfo.swift */,
+				E1905A5F24AAE8BF46922A8A /* MedicalView.swift */,
+				C6F34503AA790E9AB7D8818C /* OnboardingView.swift */,
 				017C6036504EE1266ACBB71B /* PhoneMotionSource.swift */,
 				D7C2A581CD14E451EF96CC84 /* PhoneTestView.swift */,
 				EE73D3087A142B0A8D4681EB /* PhoneWatchLink.swift */,
-				EAD6E5019704DDECAE7B4C4C /* SetupCheckView.swift */,
+				3F0FB812E3F14E51408989E0 /* TodayView.swift */,
+				29A2879965ED18F81541937D /* TremorReport.swift */,
 				04CB1E2CD7F025CFEB707C44 /* TremorTrackApp.swift */,
 			);
 			path = TremorTrack;
@@ -268,10 +337,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D917E70FFFAD7B9ABE0AF8E /* AccountView.swift in Sources */,
+				4462AF662F990338B87FEC29 /* Alerts.swift in Sources */,
+				56DEE2B4C751B324ECA803AA /* AppModel.swift in Sources */,
+				38428E19D8730B5F6CB8A742 /* Components.swift in Sources */,
+				C69DC978704C0A130F94FAE8 /* DoseLogView.swift in Sources */,
+				6353D28FED34BDD083AE36A2 /* HistoryView.swift in Sources */,
+				6C335F364E4E3640AC26DCA0 /* LiveTremor.swift in Sources */,
+				40F1D2091BB3BB0CFEF3649F /* LoginView.swift in Sources */,
+				75E614A8A5ED58281818854C /* MedicalInfo.swift in Sources */,
+				22FEA9C831FB960C4B244B87 /* MedicalView.swift in Sources */,
+				BA28C4AD67227C5F072F684D /* OnboardingView.swift in Sources */,
 				1090F18216F5ABB37DB13031 /* PhoneMotionSource.swift in Sources */,
 				C6CC99AA0F42F80E56476B43 /* PhoneTestView.swift in Sources */,
 				596429533217C483A3A83099 /* PhoneWatchLink.swift in Sources */,
-				069252BD26E2CA4DC86BADEF /* SetupCheckView.swift in Sources */,
+				B122EF63FA0F45B49D6DE702 /* TodayView.swift in Sources */,
+				C3358D0678615888A39B5073 /* TremorReport.swift in Sources */,
 				7646210682942458C9504011 /* TremorTrackApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -280,10 +361,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F7C797A402179D2838A0BA4 /* AccountView.swift in Sources */,
+				DF8F92499FCAC0DFAA099486 /* Alerts.swift in Sources */,
+				02213CD2DF95560ACE01F172 /* AppModel.swift in Sources */,
+				1FB05B115D34B8F484155058 /* Components.swift in Sources */,
+				8F433FFF68DF5CDAC3C0C9A7 /* DoseLogView.swift in Sources */,
+				08A0A26EA3BF5CA537C4DA21 /* HistoryView.swift in Sources */,
+				EDCF20E064B13DA50FE74151 /* LiveTremor.swift in Sources */,
+				C7BFC65BFE30BC82DDF85112 /* LoginView.swift in Sources */,
+				94E10896A32C75D07AF222CC /* MedicalInfo.swift in Sources */,
+				37243283A435D32C30134824 /* MedicalView.swift in Sources */,
+				32624259CF07284FC2A531FD /* OnboardingView.swift in Sources */,
 				5998252E27243BF8FB73EBE1 /* PhoneMotionSource.swift in Sources */,
 				4E0D1EDD8FE6E07FA660F053 /* PhoneTestView.swift in Sources */,
 				3F14BED9804013EB2EC942CD /* PhoneWatchLink.swift in Sources */,
-				0A2E575ABBABD348CD9A408A /* SetupCheckView.swift in Sources */,
+				FC74B3222AD5CD31C874EA6C /* TodayView.swift in Sources */,
+				EFCC54C12D6149A6399FA972 /* TremorReport.swift in Sources */,
 				6D47CD03EDFC0304618B7684 /* TremorTrackApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -292,8 +385,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A447543A72E2E39B2A39A7BB /* SigningCheckView.swift in Sources */,
+				C970393A6DE2B3E06D7844C4 /* AllDayRecorder.swift in Sources */,
+				5A5E79CDDEC4E428F15DAC45 /* CalmView.swift in Sources */,
+				F179BB316934BED722D0133A /* DoseView.swift in Sources */,
+				8E62B90D5F8ED5B3C350BD40 /* LiveView.swift in Sources */,
+				8081E23781BB14767D00CB9E /* MotionCapture.swift in Sources */,
+				00AD5BCA05F20A39D51132DC /* TrackingSession.swift in Sources */,
 				E824B1F20C59CCE4E749E3E1 /* TremorTrackWatchApp.swift in Sources */,
+				00BF4D3D73DF8134C2600D74 /* WatchLink.swift in Sources */,
+				FC42708373EB686340D5C9A9 /* WatchTracker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

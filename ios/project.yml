@@ -34,11 +34,11 @@ targetTemplates:
     info:
       path: Config/${target_name}-Info.plist
       properties:
-        CFBundleDisplayName: TremorTrack+
+        CFBundleDisplayName: Kineon
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        NSMotionUsageDescription: TremorTrack+ reads your phone's motion sensor during the 30-second tremor test.
-        NSLocalNetworkUsageDescription: TremorTrack+ sends tremor readings to your clinic's server on this network.
+        NSMotionUsageDescription: Kineon reads your phone's motion sensor during the 30-second tremor test.
+        NSLocalNetworkUsageDescription: Kineon sends tremor readings to your clinic's server on this network.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
 targets:
@@ -65,13 +65,14 @@ targets:
     info:
       path: TremorTrackWatch/Info.plist
       properties:
-        CFBundleDisplayName: TremorTrack+
+        CFBundleDisplayName: Kineon
         WKApplication: true
         WKCompanionAppBundleIdentifier: $(BUNDLE_ID_PREFIX)
-        WKBackgroundModes: [workout-processing]
-        NSMotionUsageDescription: TremorTrack+ reads your watch's motion sensor to measure tremor.
-        NSHealthShareUsageDescription: TremorTrack+ reads your heart rate during tracking, to support Calm Mode.
-        NSHealthUpdateUsageDescription: TremorTrack+ records tracking sessions as workouts so the watch keeps measuring with your wrist down.
+        # workout-processing keeps HKWorkoutSession running; physical-therapy is the fallback extended runtime session.
+        WKBackgroundModes: [workout-processing, physical-therapy]
+        NSMotionUsageDescription: Kineon reads your watch's motion sensor to measure tremor.
+        NSHealthShareUsageDescription: Kineon reads your heart rate during tracking, to support Calm Mode.
+        NSHealthUpdateUsageDescription: Kineon runs tracking as a workout session so the watch keeps measuring with your wrist down. Sessions are not saved to Health.
     entitlements:
       path: TremorTrackWatch/TremorTrackWatch.entitlements
       properties:
