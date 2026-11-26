@@ -246,7 +246,7 @@ public struct Report: ContractModel, Sendable {
 }
 
 /// Every model the apps send or receive, for the contract test.
-public let contractModels: [any ContractModel.Type] = [
+public var contractModels: [any ContractModel.Type] { [
     MotionWindow.self, ScoreResult.self, DoseEvent.self, TimelinePoint.self, Timeline.self, Baseline.self,
     CalmEvaluateRequest.self, CalmDecision.self, CalmOutcome.self, Consent.self, Report.self,
-]
+] }

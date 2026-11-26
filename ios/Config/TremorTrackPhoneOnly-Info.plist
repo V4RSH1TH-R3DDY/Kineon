@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>TremorTrack+</string>
+	<string>Kineon</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -26,9 +26,9 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>TremorTrack+ sends tremor readings to your clinic's server on this network.</string>
+	<string>Kineon sends tremor readings to your clinic's server on this network.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>TremorTrack+ reads your phone's motion sensor during the 30-second tremor test.</string>
+	<string>Kineon reads your phone's motion sensor during the 30-second tremor test.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

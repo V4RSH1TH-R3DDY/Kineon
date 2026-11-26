@@ -9,3 +9,4 @@ node_modules/
 xcuserdata/
 DerivedData/
 ios/Config/Local.xcconfig
+.DS_Store

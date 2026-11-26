@@ -8,30 +8,33 @@ struct PhoneTestView: View {
     @State private var test: PhoneTest
     @State private var run: Task<Void, Never>?
 
-    init(api: APIClient, patientId: String) {
+    /// `onResult` gets each score the server returns, with the window's start time.
+    init(api: APIClient, patientId: String, onResult: @escaping @MainActor @Sendable (ScoreResult, Date) -> Void = { _, _ in }) {
         self.patientId = patientId
         simulated = !PhoneMotionSource.isAvailable
         let source: any MotionSource = simulated ? SyntheticMotionSource() : PhoneMotionSource()
-        _test = State(initialValue: PhoneTest(source: source, score: { try await api.postPhoneTest($0) }))
+        _test = State(initialValue: PhoneTest(source: source, score: { w in
+            let r = try await api.postPhoneTest(w)
+            await onResult(r, w.startedAt)
+            return r
+        }))
     }
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
+            Spacer()
+            content.frame(maxWidth: .infinity)
+            Spacer()
             if simulated {
                 Label("Simulated signal", systemImage: "waveform.badge.exclamationmark")
-                    .font(.callout.bold())
-                    .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(.orange.opacity(0.2), in: .capsule)
+                    .font(.footnote.weight(.semibold)).foregroundStyle(.orange)
+                    .padding(.bottom, 12)
             }
-            Spacer()
-            content
-            Spacer()
-            Text("Tracking, not a diagnosis.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
         }
-        .padding()
-        .navigationTitle("Tremor test")
+        .padding(.horizontal, 28)
+        .safeAreaInset(edge: .bottom) { bottomBar }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Tremor Test")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(test.phase == .recording || test.phase == .scoring)
         .sensoryFeedback(trigger: test.phase) { _, new in new == .scoring ? .success : nil }
@@ -47,84 +50,79 @@ struct PhoneTestView: View {
     @ViewBuilder private var content: some View {
         switch test.phase {
         case .ready:
-            VStack(spacing: 16) {
-                Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.tint)
-                Text("Sit down and rest your forearm on your thigh or a table. Hold the phone loosely in the hand being tested and keep it there for 30 seconds.")
-                    .multilineTextAlignment(.center)
-                startButton("Start test")
+            VStack(spacing: 28) {
+                Image(systemName: "hand.raised")
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(.teal)
+                VStack(spacing: 10) {
+                    Text("Rest your arm").font(.title.weight(.bold))
+                    Text("Sit down and rest your forearm on your leg or a table. Hold the phone loosely in the hand you're testing, and keep still for 30 seconds.")
+                        .font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                }
             }
         case .recording:
-            VStack(spacing: 16) {
+            VStack(spacing: 28) {
                 ZStack {
-                    ProgressView(value: test.elapsed, total: PhoneTest.duration)
-                        .progressViewStyle(.circular)
-                        .scaleEffect(4)
+                    Circle().stroke(Color(.systemFill), lineWidth: 10)
+                    Circle()
+                        .trim(from: 0, to: test.elapsed / PhoneTest.duration)
+                        .stroke(.teal, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 0.2), value: test.elapsed)
                     Text(test.remaining.rounded(.up).formatted())
-                        .font(.largeTitle.monospacedDigit().bold())
+                        .font(.system(size: 64, weight: .semibold, design: .rounded).monospacedDigit())
                         .contentTransition(.numericText(countsDown: true))
                 }
-                .frame(height: 160)
-                Text("Keep your hand relaxed and resting.")
-                if test.restarts > 0 {
-                    Text("The sensor paused, so the recording started again.")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                .frame(width: 200, height: 200)
+                VStack(spacing: 6) {
+                    Text("Keep your hand relaxed").font(.title3.weight(.semibold))
+                    if test.restarts > 0 {
+                        Text("The sensor paused, so the recording started again.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
                 }
-                Button("Cancel", role: .cancel) { run?.cancel() }
             }
         case .scoring:
-            ProgressView("Scoring…")
+            VStack(spacing: 14) {
+                ProgressView().controlSize(.large)
+                Text("Scoring").font(.headline).foregroundStyle(.secondary)
+            }
         case let .finished(display):
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 ResultSummary(display: display)
-                startButton("Test again")
+                Disclaimer()
             }
         case let .failed(message):
-            VStack(spacing: 16) {
-                Label(message, systemImage: "exclamationmark.triangle")
-                    .multilineTextAlignment(.center)
-                startButton("Try again")
+            VStack(spacing: 12) {
+                Image(systemName: "wifi.exclamationmark").font(.system(size: 44)).foregroundStyle(.secondary)
+                Text("Couldn't finish the test").font(.title3.weight(.semibold))
+                Text(message).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
             }
         }
     }
 
-    private func startButton(_ title: LocalizedStringKey) -> some View {
-        Button(title) {
+    @ViewBuilder private var bottomBar: some View {
+        Group {
+            switch test.phase {
+            case .ready: primary("Start Test")
+            case .recording: Button("Cancel", role: .cancel) { run?.cancel() }.buttonStyle(.glass).controlSize(.large)
+            case .scoring: EmptyView()
+            case .finished: primary("Test Again")
+            case .failed: primary("Try Again")
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 8)
+    }
+
+    private func primary(_ title: LocalizedStringKey) -> some View {
+        Button {
             run = Task { await test.run(patientId: patientId) }
+        } label: {
+            Text(title).font(.headline).frame(maxWidth: .infinity).padding(.vertical, 6)
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.glassProminent)
         .controlSize(.large)
-    }
-}
-
-/// A score with its likely range, or "Not enough data" with the reason. Never a zero for a refusal.
-private struct ResultSummary: View {
-    let display: ScoreDisplay
-
-    var body: some View {
-        switch display {
-        case let .score(value, low, high):
-            VStack(spacing: 8) {
-                Text(value.formatted(.number.precision(.fractionLength(0))))
-                    .font(.system(size: 72, weight: .bold).monospacedDigit())
-                Text("Tremor score, 0 to 100")
-                    .foregroundStyle(.secondary)
-                if let low, let high {
-                    Text("Likely between \(low.formatted(.number.precision(.fractionLength(0)))) and \(high.formatted(.number.precision(.fractionLength(0))))")
-                        .font(.callout)
-                }
-            }
-        case let .notEnoughData(reason):
-            VStack(spacing: 8) {
-                Text("Not enough data")
-                    .font(.title2.bold())
-                Text(reason)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-            }
-        }
     }
 }
 

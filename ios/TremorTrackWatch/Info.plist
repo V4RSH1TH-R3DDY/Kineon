@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>TremorTrack+</string>
+	<string>Kineon</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,16 +21,17 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>TremorTrack+ reads your heart rate during tracking, to support Calm Mode.</string>
+	<string>Kineon reads your heart rate during tracking, to support Calm Mode.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>TremorTrack+ records tracking sessions as workouts so the watch keeps measuring with your wrist down.</string>
+	<string>Kineon runs tracking as a workout session so the watch keeps measuring with your wrist down. Sessions are not saved to Health.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>TremorTrack+ reads your watch's motion sensor to measure tremor.</string>
+	<string>Kineon reads your watch's motion sensor to measure tremor.</string>
 	<key>WKApplication</key>
 	<true/>
 	<key>WKBackgroundModes</key>
 	<array>
 		<string>workout-processing</string>
+		<string>physical-therapy</string>
 	</array>
 	<key>WKCompanionAppBundleIdentifier</key>
 	<string>$(BUNDLE_ID_PREFIX)</string>
