@@ -10,3 +10,4 @@ xcuserdata/
 DerivedData/
 ios/Config/Local.xcconfig
 .DS_Store
+.serena/
