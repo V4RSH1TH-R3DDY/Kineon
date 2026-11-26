@@ -6,7 +6,7 @@ What sets it apart is that it says how sure it is and refuses to guess. A loose 
 
 ## Status
 
-The backend and doctor dashboard are built and tested. The Swift watch and iPhone app is not in this repository yet. It is being built on a Mac against `contracts/openapi.json`.
+The backend and doctor dashboard are built and tested. The Swift iPhone and Apple Watch app is in `ios/`, written against `contracts/openapi.json`. It needs a Mac with Xcode, so it was not built or run on the machine that holds the backend. Nothing in it has been tested on a real iPhone or watch yet.
 
 | Area | State |
 |---|---|
@@ -19,7 +19,8 @@ The backend and doctor dashboard are built and tested. The Swift watch and iPhon
 | PDF, CSV and PNG export with consent, audit log and signed digest | Built. |
 | Calm voice (ElevenLabs) | Built, never called against the real API. Needs a key. |
 | Doctor dashboard (React) | Built. |
-| Watch and iPhone app | Not started here. |
+| iPhone app (SwiftUI) | Written, not device-tested. Phone tremor test, live reading, today and history views, dose log, medical details, PDF/PNG report, offline upload queue. |
+| Apple Watch app | Written, not device-tested. Live motion at 50 Hz under a workout session, all-day recording, dose log, Calm screen. Relays through the phone. |
 | Authentication | None. Do not expose this to a network. |
 
 ## Run it
@@ -43,6 +44,15 @@ npm run dev                               # http://localhost:5173, proxies /v1 t
 ```
 
 Open the dashboard and load `demo-patient`. The demo patient is invented and is labelled illustrative everywhere it appears.
+
+iPhone and watch apps, on a Mac with Xcode 26 or newer, from `ios/`:
+
+```
+(cd TremorKit && swift test)             # shared package, no Xcode project needed
+cp Config/Local.xcconfig.example Config/Local.xcconfig   # set your team id and a unique bundle prefix, then open TremorTrack.xcodeproj
+```
+
+`project.yml` is the source of the Xcode project: edit it and run `xcodegen`. For a phone to reach the backend, start it with `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000` and enter the Mac's address in the app. There is no authentication, so do this only on a trusted network or a personal hotspot. `TremorTrackPhoneOnly` is the same app without the watch, for installing before the watch is registered with your team.
 
 ## Configuration
 
@@ -89,6 +99,9 @@ Exports are hashed with SHA-256 and signed with Ed25519. The digest comes back i
 - **Calm Mode thresholds are guesses.** The outcome log is the data to tune them with.
 - **The Hindi and Kannada text needs a native speaker** before it reaches a doctor.
 - **The PDF is English only.** Its fonts cannot draw Indian scripts.
+- **The iOS app is untested on hardware.** It has not been built on a device, and HealthKit under a free Apple ID is unconfirmed. The Swift package tests and the contract check need a Mac to run.
+- **The app's sign-in is a demo.** It keeps an account on the phone and verifies nothing. Medical details stay on the phone and are never uploaded. The report the phone exports is not signed: the signed report comes from the dashboard.
+- **The watch cannot run live all day.** All-day data comes from the watch's sensor recorder: no heart rate or gyroscope, and it arrives minutes late.
 - **No authentication.** Anyone who knows a patient id can read that patient's data and create a consent. Consent is ticked by clinic staff in the dashboard. A real deployment needs the patient's own consent screen on the phone.
 - **The signing key is an unencrypted file, and Ed25519 is not post-quantum.** Production needs a KMS or HSM and a post-quantum scheme.
 
@@ -104,5 +117,6 @@ backend/tests/  pytest suite
 dashboard/      React doctor dashboard (Vite, TypeScript)
 contracts/      openapi.json
 scripts/        dump_openapi.py, eval_pads.py
-ios/            reserved for the Swift app
+ios/            Swift app: TremorKit (shared package), TremorTrack (iPhone), TremorTrackWatch
+docs/           video voiceover scripts, watch-feasibility.md
 ```
