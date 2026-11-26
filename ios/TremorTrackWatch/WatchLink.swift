@@ -1,5 +1,5 @@
-// The watch end of WatchConnectivity. Windows and doses go to the phone with transferUserInfo, which the system
-// queues and delivers even if the phone is away or asleep, so nothing is lost and nothing is sent twice.
+// The watch queues windows and doses with WatchConnectivity. When the phone is reachable it also sends fresh
+// windows immediately. The phone uses the same upload ID for both deliveries.
 // The phone posts them to the backend and sends back the score, by message (fast) and application context (lasting).
 import Foundation
 import Observation
@@ -29,7 +29,12 @@ final class WatchLink: NSObject {
 
     func send(_ w: MotionWindow) {
         guard let data = WatchWire.encode(w) else { return }
-        WCSession.default.transferUserInfo([WatchWire.window: data])
+        let session = WCSession.default
+        let payload = [WatchWire.window: data]
+        session.transferUserInfo(payload)
+        if session.isReachable, Date().timeIntervalSince(w.startedAt) < 120 {
+            session.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+        }
         sentThisSession += 1
         refreshWaiting()
     }

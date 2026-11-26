@@ -19,7 +19,7 @@ uv run python -m app.store.seed                 # 14-day illustrative "demo-pati
 uv run uvicorn app.main:app --port 8000
 ```
 
-Dashboard (run from `dashboard/`, backend on :8000; Vite proxies `/v1` to it, so no CORS):
+Dashboard (run from `dashboard/`, backend on :8000; Vite proxies the dashboard's doctor, link, and verification routes):
 
 ```
 npm run dev        # http://localhost:5173
@@ -53,15 +53,16 @@ Signing: copy `ios/Config/Local.xcconfig.example` to `Local.xcconfig` (gitignore
 - **`main.py` holds all routes** and module-level singletons `store` (SQLite `Store`, path from `KINEON_DB`) and `signer` (Ed25519, `KINEON_SIGNING_KEY`). `backend/app/api/` is empty. Every route is implemented; a new route not yet built should raise the `_todo` 501 rather than be omitted, so the schema stays complete.
 - **Scoring pipeline** (`app/sense/score.py`, `score_window`): quality gate (sample rate ≥25 Hz, ≥5 s, flatline, clipping, HF artefact) → activity separation by spectral shape (narrow stable 3–12 Hz peak = tremor; broad/wandering = `voluntary_movement`) → 0–100 score with confidence band from three sub-windows. Refusals return `status: "insufficient_data"` with a `reason`; clients must never show these as zero.
 - **Downstream of scores:** `twin/baseline.py` (rolling median of last 200 good windows), `store/db.py` (single-file SQLite store: scores, doses, review labels, calm episodes, consents, exports, audit log), `calm.py` (Calm Mode decision rules — distinct from `voice/calm.py`, which is the ElevenLabs TTS client), `report/summary.py` (en/hi/kn text + disclaimers) and `report/render.py` (PDF/CSV/PNG).
-- **Export trust chain:** export requires an active consent id (denials are audited) → bytes hashed SHA-256 → digest signed and stored → returned in `X-Report-Digest`. `GET /v1/verify/{digest}` checks it. The dashboard hashes files client-side for verification; files are never uploaded.
+- **Doctor access:** saved doctor routes use the clinic key. Live sharing also needs a link approved by the phone and confirmed by the doctor. The phone’s approved readings and medical record are filed by patient ID. The illustrative patient can be opened without credentials.
+- **Export trust chain:** the clinic key authorizes the dashboard to export saved history. The export is hashed with SHA-256, and the signed digest is saved and returned in `X-Report-Digest`. `GET /v1/verify/{digest}` checks it. The dashboard hashes files in the browser for verification.
 
 ## iOS app (`ios/`)
 
 - **Targets** (`project.yml`, XcodeGen; the `.xcodeproj` is generated, edit the YAML): `TremorTrack` (iPhone app with the watch app embedded), `TremorTrackPhoneOnly` (same app, no watch, for installing before the watch is registered), `TremorTrackWatch`, and the `TremorKit` Swift package.
 - **`TremorKit`** is shared, plain Foundation so `swift test` runs on macOS: Codable mirrors of the backend schemas, `APIClient`, `WindowBuffer`/`WindowSampler`, `PhoneTest`, `Outbox` (on-disk retry queue; readings are never dropped silently, doses are kept when it is full), `WatchWire` (watch to phone payloads) and `ScoreDisplay` (a refused window always reads "Not enough data", never zero).
-- **Only the iPhone talks to the backend.** The watch sends windows and doses to the phone over WatchConnectivity (`transferUserInfo`, queued by the system); `AppModel` posts them, or queues them in the `Outbox`, and sends the score back. The watch runs under an `HKWorkoutSession` (falls back to `WKExtendedRuntimeSession`, then screen-on only); `AllDayRecorder` uses `CMSensorRecorder` for all-day data with no heart rate or gyroscope.
+- **Only the iPhone talks to the backend.** The watch sends windows and doses over WatchConnectivity (`transferUserInfo`). `AppModel` saves watch windows before uploading them for scoring and keeps a local copy of scored history and synced doses. The watch runs under an `HKWorkoutSession` with fallbacks. `AllDayRecorder` uses `CMSensorRecorder` for all-day data with no heart rate or gyroscope.
 - **Contract rule:** every model lists its wire keys in a `CodingKeys` enum, and `ContractTests` compares them with `contracts/openapi.json`. After a backend schema change, regenerate the contract, then update `Models.swift` and run the contract test.
-- **Demo-only features:** `LoginView` keeps an account on the phone and verifies nothing. `MedicalInfo` stays on the phone, encrypted while locked, and is never uploaded. `TremorReport` exports an unsigned PDF/PNG from the phone; the signed, consented report comes only from the dashboard export.
+- **Demo-only features:** `LoginView` keeps a local account. Live approval sends a copy of `MedicalInfo` to the saved patient file. The patient can send an updated copy while sharing. `TremorReport` exports an unsigned PDF/PNG from the phone. The dashboard issues signed reports.
 - Anything built from `SyntheticSignal` must be labelled "Simulated signal" on screen.
 - `docs/` holds the video voiceover scripts and `watch-feasibility.md` (what is built and what is not on the watch).
 
@@ -71,5 +72,5 @@ Signing: copy `ios/Config/Local.xcconfig.example` to `Local.xcconfig` (gitignore
 - Tests use synthetic, seeded accelerometer windows from `backend/tests/synth.py` (50 Hz, in g, gravity on z). `tests/conftest.py` forces an in-memory DB, temp signing key and voice cache, and strips `ELEVENLABS_*` env vars — tests must never hit the real API or files.
 - The demo patient is invented and flagged `illustrative` everywhere; keep that flag surfaced in any new view or export.
 - Hindi/Kannada strings are machine-written and unreviewed; the PDF is English-only (fonts can't render Indic scripts).
-- There is no authentication — don't add features that assume one, and don't expose the server to a network. The app's login screen is a demo and does not change this.
+- Saved doctor routes use a clinic key. Live routes also require a patient-approved link. Legacy patient data is accessible without identity verification. Use synthetic data on a trusted network.
 - Untracked files in the repo root (a demo-plan spreadsheet, a PDF brief, a CSV export) are the user's working files. Don't commit or delete them.

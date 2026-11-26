@@ -75,7 +75,6 @@ private struct SetupForm: View {
     @Environment(AppModel.self) private var model
     @State private var check: AppModel.ConnectionCheck?
     @State private var checking = false
-    @State private var share = true
     @State private var finishing = false
 
     var body: some View {
@@ -116,17 +115,12 @@ private struct SetupForm: View {
                 Text(model.patientIdText.isEmpty ? "Readings are saved under this ID." : (model.patientProblem ?? "Readings are saved under this ID."))
             }
 
-            Section {
-                Toggle("Share with my clinic", isOn: $share)
-            } footer: {
-                Text("Your clinic can download a signed report of your readings. You can turn this off at any time in Settings.")
-            }
         }
         .navigationTitle("Set Up")
         .navigationBarTitleDisplayMode(.large)
         .safeAreaInset(edge: .bottom) {
             Button {
-                Task { finishing = true; await model.finishSetup(shareWithClinic: share); finishing = false }
+                Task { finishing = true; await model.finishSetup(); finishing = false }
             } label: {
                 Group {
                     if finishing { ProgressView() } else { Text("Done").font(.headline) }

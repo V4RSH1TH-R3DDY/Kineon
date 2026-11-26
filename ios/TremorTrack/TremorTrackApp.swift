@@ -42,9 +42,10 @@ struct RootView: View {
         .task(id: phase) {
             guard phase == .active, model.isSetUp, model.account != nil else { return }
             await model.refresh()
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(30))
-                await model.drain()
+            while !Task.isCancelled && model.isSetUp && model.account != nil {
+                do { try await Task.sleep(for: .seconds(30)) } catch { return }
+                guard model.isSetUp, model.account != nil else { return }
+                await model.sendPending()
             }
         }
     }

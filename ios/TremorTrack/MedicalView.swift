@@ -32,7 +32,7 @@ struct MedicalDetailsView: View {
                             Text(m.notes).font(.body)
                         }
                     }
-                    Label("Kept on this iPhone only and encrypted while it's locked. Not sent to the server.",
+                    Label("Stored on this iPhone. You can share a copy with a doctor from Account.",
                           systemImage: "lock.fill")
                         .font(.footnote).foregroundStyle(.secondary).padding(.horizontal, 4)
                 }

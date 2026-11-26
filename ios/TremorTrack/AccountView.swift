@@ -7,7 +7,10 @@ struct AccountView: View {
     @State private var check: AppModel.ConnectionCheck?
     @State private var checking = false
     @State private var sharingBusy = false
-    @State private var sharingFailed = false
+    @State private var sharingError: String?
+    @State private var sharingStatus: String?
+    @State private var doctorCode = ""
+    @State private var recordToShare: AppModel.DoctorApproval?
     @State private var confirmLogout = false
     /// Debug builds can open Medical Details with the launch argument `-uiMedical YES` (used for screenshots).
     @State private var showMedical = RootView.launchFlag("uiMedical")
@@ -65,7 +68,7 @@ struct AccountView: View {
                             .textInputAutocapitalization(.never).autocorrectionDisabled()
                     } label: { tile("Patient ID", "number", .teal) }
                     if let p = model.patientProblem { Text(p).font(.footnote).foregroundStyle(.red) }
-                } header: { Text("Readings") } footer: { Text("Your readings are saved on the server under this ID.") }
+                } header: { Text("Readings") } footer: { Text("Readings are saved on this iPhone and synced under this patient ID.") }
 
                 Section {
                     LabeledContent {
@@ -93,19 +96,46 @@ struct AccountView: View {
                 }
 
                 Section {
-                    Toggle(isOn: Binding(
-                        get: { model.isSharing },
-                        set: { on in
-                            Task {
-                                sharingBusy = true
-                                sharingFailed = !(await model.setSharing(on))
-                                sharingBusy = false
+                    TextField("Six-digit code", text: $doctorCode)
+                        .keyboardType(.numberPad)
+                        .onChange(of: doctorCode) { _, value in
+                            doctorCode = String(value.filter { "0123456789".contains($0) }.prefix(6))
+                        }
+                    Button("Approve live sharing") {
+                        let code = doctorCode
+                        Task {
+                            await sharingAction("Approved. Ask your doctor to confirm on their dashboard.") {
+                                try await model.approveDoctor(code: code)
+                                doctorCode = ""
                             }
-                        })) { tile("Share with my clinic", "stethoscope", .pink) }
-                    .disabled(sharingBusy)
-                    if sharingFailed { Text("Couldn't reach the server. Try again.").font(.footnote).foregroundStyle(.red) }
-                } header: { Text("Data sharing") } footer: {
-                    Text("When on, your clinic can download your readings as a signed report. Turning it off stops new downloads straight away.")
+                        }
+                    }
+                    .disabled(sharingBusy || doctorCode.count != 6 || model.patientId == nil || model.server == nil)
+                    if let sharingStatus { Text(sharingStatus).font(.footnote) }
+                    if let sharingError { Text(sharingError).font(.footnote).foregroundStyle(.red) }
+                } header: { Text("Live sharing with a doctor") } footer: {
+                    Text("Enter your doctor's code to approve live tremor sharing. After they confirm, your readings and medical details are saved in your clinic file. Ending live sharing leaves the saved file available.")
+                }
+
+                if !model.doctorApprovals.isEmpty {
+                    Section("Approved requests") {
+                        ForEach(model.doctorApprovals) { approval in
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(approval.approvedAt, format: .dateTime.month().day().hour().minute())
+                                Button(approval.sharedRecord ? "Send updated medical record" : "Share medical record") {
+                                    recordToShare = approval
+                                }
+                                Button("Stop live sharing", role: .destructive) {
+                                    Task {
+                                        await sharingAction("Live sharing stopped. Your saved file remains available.") {
+                                            try await model.endDoctorAccess(approval)
+                                        }
+                                    }
+                                }
+                            }
+                            .disabled(sharingBusy)
+                        }
+                    }
                 }
 
                 Section("Apple Watch") {
@@ -115,8 +145,11 @@ struct AccountView: View {
                 }
 
                 Section {
-                    LabeledContent { Text("\(model.outbox.count)") } label: { tile("Waiting to upload", "icloud.and.arrow.up.fill", .orange) }
-                    Button("Send now") { Task { await model.drain() } }.disabled(model.outbox.isEmpty)
+                    LabeledContent { Text("\(model.pendingUploads)") } label: { tile("Waiting to upload", "icloud.and.arrow.up.fill", .orange) }
+                    Button("Send now") { Task { await model.sendPending() } }.disabled(model.pendingUploads == 0)
+                    if model.watchStorageFailed {
+                        Text("A reading could not be saved on this iPhone.").font(.footnote).foregroundStyle(.red)
+                    }
                 } header: { Text("Uploads") }
 
                 Section {
@@ -136,6 +169,40 @@ struct AccountView: View {
             } message: {
                 Text("Your readings and clinic sharing stay on the server. Medical details on this iPhone are deleted. The watch stops tracking until you sign in again.")
             }
+            .alert("Share your medical record?", isPresented: Binding(
+                get: { recordToShare != nil },
+                set: { if !$0 { recordToShare = nil } }
+            ), presenting: recordToShare) { approval in
+                Button("Cancel", role: .cancel) {}
+                Button("Share record") {
+                    Task {
+                        await sharingAction("Medical record shared.") {
+                            try await model.updateDoctorRecord(approval)
+                        }
+                    }
+                }
+            } message: { _ in
+                Text("Your doctor will receive the current medical details saved on this iPhone, including medications, allergies and notes.")
+            }
+        }
+    }
+
+    private func sharingAction(_ success: String, _ action: () async throws -> Void) async {
+        sharingBusy = true
+        sharingError = nil
+        sharingStatus = nil
+        defer { sharingBusy = false }
+        do {
+            try await action()
+            sharingStatus = success
+        } catch APIError.notFound {
+            sharingError = "This request could not be found or has expired. Ask your doctor for a new code."
+        } catch APIError.http(let status, _) where status == 403 {
+            sharingError = "The code was rejected. Check it with your doctor or ask for a new one."
+        } catch APIError.http(let status, _) where status == 422 {
+            sharingError = "The server could not accept these details. Review your medical record and try again."
+        } catch {
+            sharingError = "Could not complete the request. Check the connection and try again."
         }
     }
 

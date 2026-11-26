@@ -1,9 +1,11 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// The dashboard calls the FastAPI backend through this proxy, so no CORS setup is needed.
+// Forward only the API used by the doctor dashboard. The phone uses the backend directly.
+const proxy = { '^/v1/(doctor|links|verify)(/|$)': 'http://localhost:8000' }
+
 export default defineConfig({
   plugins: [react()],
-  server: { proxy: { '/v1': 'http://localhost:8000' } },
-  preview: { proxy: { '/v1': 'http://localhost:8000' } },
+  server: { proxy },
+  preview: { proxy },
 })

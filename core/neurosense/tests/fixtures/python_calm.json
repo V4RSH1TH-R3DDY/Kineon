@@ -1,0 +1,114 @@
+[
+  {
+    "request": {
+      "recent_score": 25.0,
+      "baseline_score": 20.0,
+      "heart_rate_bpm": null,
+      "baseline_heart_rate_bpm": null,
+      "manual": false
+    },
+    "prior_episodes_24h": 0,
+    "expected": {
+      "trigger": false,
+      "reason": "Your tremor is within your usual range.",
+      "tips": [],
+      "suggest_contact_clinician": false
+    }
+  },
+  {
+    "request": {
+      "recent_score": 45.0,
+      "baseline_score": 20.0,
+      "heart_rate_bpm": 95.0,
+      "baseline_heart_rate_bpm": 70.0,
+      "manual": false
+    },
+    "prior_episodes_24h": 0,
+    "expected": {
+      "trigger": true,
+      "reason": "Your tremor is well above your usual level and your heart rate is up.",
+      "tips": [
+        "Sit down and rest your forearm on a table or armrest.",
+        "Hold your cup with both hands.",
+        "Breathe slowly with the taps: one tap in, two taps out."
+      ],
+      "suggest_contact_clinician": false
+    }
+  },
+  {
+    "request": {
+      "recent_score": 8.0,
+      "baseline_score": 4.0,
+      "heart_rate_bpm": null,
+      "baseline_heart_rate_bpm": null,
+      "manual": false
+    },
+    "prior_episodes_24h": 0,
+    "expected": {
+      "trigger": false,
+      "reason": "Your tremor is within your usual range.",
+      "tips": [],
+      "suggest_contact_clinician": false
+    }
+  },
+  {
+    "request": {
+      "recent_score": 20.0,
+      "baseline_score": 20.0,
+      "heart_rate_bpm": null,
+      "baseline_heart_rate_bpm": null,
+      "manual": true
+    },
+    "prior_episodes_24h": 0,
+    "expected": {
+      "trigger": true,
+      "reason": "You asked for Calm Mode.",
+      "tips": [
+        "Sit down and rest your forearm on a table or armrest.",
+        "Hold your cup with both hands.",
+        "Breathe slowly with the taps: one tap in, two taps out."
+      ],
+      "suggest_contact_clinician": false
+    }
+  },
+  {
+    "request": {
+      "recent_score": 70.0,
+      "baseline_score": 15.0,
+      "heart_rate_bpm": null,
+      "baseline_heart_rate_bpm": null,
+      "manual": false
+    },
+    "prior_episodes_24h": 0,
+    "expected": {
+      "trigger": true,
+      "reason": "Your tremor is well above your usual level.",
+      "tips": [
+        "Sit down and rest your forearm on a table or armrest.",
+        "Hold your cup with both hands.",
+        "Breathe slowly with the taps: one tap in, two taps out."
+      ],
+      "suggest_contact_clinician": true
+    }
+  },
+  {
+    "request": {
+      "recent_score": 45.0,
+      "baseline_score": 20.0,
+      "heart_rate_bpm": null,
+      "baseline_heart_rate_bpm": null,
+      "manual": false
+    },
+    "prior_episodes_24h": 2,
+    "expected": {
+      "trigger": true,
+      "reason": "Your tremor is well above your usual level.",
+      "tips": [
+        "Sit down and rest your forearm on a table or armrest.",
+        "Hold your cup with both hands.",
+        "Breathe slowly with the taps: one tap in, two taps out."
+      ],
+      "suggest_contact_clinician": true
+    }
+  }
+]
